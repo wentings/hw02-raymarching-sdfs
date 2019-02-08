@@ -10,12 +10,15 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 5,
-  'Load Scene': loadScene, // A function pointer, essentially
+  size_of_trash: 0,
+  background_color: 0.0,
 };
 
 let square: Square;
 let time: number = 0;
+
+let prevTrashSize : number = 0;
+let prevColor : number = 0.0;
 
 function loadScene() {
   square = new Square(vec3.fromValues(0, 0, 0));
@@ -47,6 +50,8 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  gui.add(controls, 'size_of_trash',  0, 10).step(1);
+  gui.add(controls, 'background_color', 0, 8).step(1);
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -83,9 +88,18 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     processKeyPresses();
+    if(controls.size_of_trash != prevTrashSize)
+    {
+      prevTrashSize = controls.size_of_trash;
+    }
+    if(controls.background_color != prevColor)
+    {
+      prevColor = controls.background_color;
+    }
+
     renderer.render(camera, flat, [
       square,
-    ], time);
+    ], time, prevTrashSize, prevColor);
     time++;
     stats.end();
 
